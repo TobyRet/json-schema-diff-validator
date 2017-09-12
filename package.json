@@ -1,0 +1,32 @@
+{
+  "author": "Atlassian",
+  "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Chethana Krishnakumar",
+      "email": "ckrishnakumar@atlassian.com"
+    },
+    {
+      "name": "Dmitrii Sorin",
+      "email": "dsorin@atlassian.com"
+    }
+  ],
+  "name": "json-schema-diff-validator",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:atlassian/"
+  },
+  "bin": {
+    "json-schema-diff-validator": "./bin/cli.js"
+  },
+  "dependencies": {
+    "fast-json-patch": "^2.0.5"
+  },
+  "devDependencies": {
+    "mocha": "^3.5.2"
+  },
+  "scripts": {
+    "test": "mocha -b test --reporter list"
+  }
+}

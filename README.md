@@ -10,7 +10,7 @@ Usage
 -----
 ``` 
 npm install json-schem-diff-validator -g
-json-schem-diff-validator oldschema.json newschema.json
+json-schema-diff-validator oldschema.json newschema.json
 ```
 This will return with exit code 0 if there is no breaking change.
 Throws an exception if there is a breaking change 

@@ -1,0 +1,19 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "arrow-parens": false,
+    "indent": [true, "spaces", 2],
+    "interface-name": [false],
+    "member-access": [true, "no-public"],
+    "member-ordering": {
+      "options": {
+        "order": "instance-sandwich"
+      }
+    },
+    "no-require-imports": false,
+    "no-switch-case-fall-through": true,
+    "no-unused-variable": [true, "check-parameters"],
+    "quotemark": [true, "single"],
+    "switch-default": true
+  }
+}

@@ -11,22 +11,32 @@
       "email": "dsorin@atlassian.com"
     }
   ],
+  "main": "./dist/src/validator.js",
   "name": "json-schema-diff-validator",
+  "types": "./dist/src/validator.d.ts",
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:atlassian/"
+    "url": "git@bitbucket.org:atlassian/json-schema-diff-validator.git"
   },
   "bin": {
-    "json-schema-diff-validator": "./bin/cli.js"
+    "json-schema-diff-validator": "./dist/bin/cli.js"
   },
   "dependencies": {
     "fast-json-patch": "^2.0.5"
   },
   "devDependencies": {
-    "mocha": "^3.5.2"
+    "@types/mocha": "^2.2.43",
+    "@types/node": "^8.0.30",
+    "mocha": "^3.5.2",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
   },
   "scripts": {
-    "test": "mocha -b test --reporter list"
+    "lint": "tslint -p . -c tslint.json 'src/**/*.ts'",
+    "prepublishOnly": "rm -fr dist/ && tsc",
+    "test:unit": "mocha -b test --reporter list --compilers ts:ts-node/register test/*.ts",
+    "test": "npm run lint && npm run test:unit"
   }
 }

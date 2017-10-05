@@ -93,4 +93,20 @@ describe('should validate schema when given two files:', () => {
     assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
   });
 
+  it('should not throw if node is added and it\'s required under subnodes', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+
+    const newSchema = {
+      ...originalSchema,
+      definitions: { ...originalSchema.definitions },
+      required: [ ...originalSchema.required ],
+    };
+
+    newSchema.definitions.mntent.field = { type: 'number' };
+    newSchema.definitions.mntent.required.push('field');
+
+    assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
+  });
+
 });

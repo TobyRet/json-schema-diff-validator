@@ -12,8 +12,13 @@ function getData(fileName: string) {
 function getSecondLastSubPath(path: string): string {
   const index1 = path.lastIndexOf('/');
   const index2 = path.substr(0, index1).lastIndexOf('/');
+  return path.substr(index2 + 1, index1 - 1);
+}
 
-  return path.substr(index2 + 1, index1);
+function getLastSubPath(path: string): string {
+  const index1 = path.lastIndexOf('/');
+  const index2 = path.length;
+  return path.substr(index1 + 1 , index2);
 }
 
 export function validateSchemaCompatibility(originalSchema: any, changedSchema: any): void {
@@ -26,19 +31,30 @@ export function validateSchemaCompatibility(originalSchema: any, changedSchema: 
 
   patch.forEach(node => {
     const operation = node.op;
+    const path = node.path;
+    const required = 'required';
+    const props = 'properties';
+    const defn = 'definitions';
 
     switch (operation) {
       case move:
       case remove:
+        if (getSecondLastSubPath(path) !== required) {
+          diff.push(node);
+        }
+
+        break;
+
       case replace:
         diff.push(node);
         break;
 
       case add:
-        const path = node.path;
-        const staticString = 'properties';
 
-        if (staticString !== getSecondLastSubPath(path)) {
+        if (getSecondLastSubPath(path) !== props && getSecondLastSubPath(path) !== defn ) {
+          diff.push(node);
+        }
+        if (getSecondLastSubPath(path) === defn && getLastSubPath(path) === required ) {
           diff.push(node);
         }
 

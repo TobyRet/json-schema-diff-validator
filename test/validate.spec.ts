@@ -6,7 +6,7 @@ import {
   validateSchemaFiles,
 } from '../src/validator';
 
-describe('should validate schema when given two files:', () => {
+describe('API', () => {
   it('should return none if data is same', () => {
     const file1 = path.resolve('resources/data.schema');
     const file2 = path.resolve('resources/data.schema');

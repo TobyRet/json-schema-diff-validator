@@ -21,7 +21,15 @@ function getLastSubPath(path: string): string {
   return path.substr(index1 + 1 , index2);
 }
 
-export function validateSchemaCompatibility(originalSchema: any, changedSchema: any): void {
+export interface ValidatorOptions {
+  allowNewOneOf?: boolean;
+}
+
+export function validateSchemaCompatibility(
+  originalSchema: any,
+  changedSchema: any,
+  opts: ValidatorOptions = {},
+): void {
   const move = 'move';
   const remove = 'remove';
   const replace = 'replace';
@@ -50,11 +58,18 @@ export function validateSchemaCompatibility(originalSchema: any, changedSchema: 
         break;
 
       case add:
+        const isNewAnyOfItem = /items\/anyOf\/[\d]+$/.test(path);
+        const pathTwoLastLevels = getSecondLastSubPath(path);
 
-        if (getSecondLastSubPath(path) !== props && getSecondLastSubPath(path) !== defn ) {
-          diff.push(node);
+        if (pathTwoLastLevels !== props && pathTwoLastLevels !== defn) {
+          if (isNewAnyOfItem && opts.allowNewOneOf) {
+            // skip this
+          } else {
+            diff.push(node);
+          }
         }
-        if (getSecondLastSubPath(path) === defn && getLastSubPath(path) === required ) {
+
+        if (pathTwoLastLevels === defn && getLastSubPath(path) === required ) {
           diff.push(node);
         }
 
@@ -68,9 +83,13 @@ export function validateSchemaCompatibility(originalSchema: any, changedSchema: 
   assert.strictEqual(diff.length, 0, `The schema is not backward compatible. Difference include breaking change = ${JSON.stringify(diff)}`);
 }
 
-export function validateSchemaFiles(file1: string, file2: string): void {
+export function validateSchemaFiles(
+  file1: string,
+  file2: string,
+  opts: ValidatorOptions = {},
+): void {
   const original = getData(file1);
   const changed = getData(file2);
 
-  return validateSchemaCompatibility(original, changed);
+  return validateSchemaCompatibility(original, changed, opts);
 }

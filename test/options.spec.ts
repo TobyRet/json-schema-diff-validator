@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { deepClone } from 'fast-json-patch';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
@@ -6,16 +7,12 @@ import {
   validateSchemaFiles,
 } from '../src/validator';
 
-function clone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj));
-}
-
 describe('Options', () => {
   describe('allowNewOneOf', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data_options_allowOneOf.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
-    const newSchema = clone<any>(originalSchema);
+    const newSchema = deepClone(originalSchema);
     newSchema.definitions.root.items.anyOf.push({ type: 'number' });
 
     context('allowNewOneOf is not set', () => {

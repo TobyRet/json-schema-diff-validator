@@ -14,7 +14,7 @@
   "main": "./dist/src/validator.js",
   "name": "json-schema-diff-validator",
   "types": "./dist/src/validator.d.ts",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://bitbucket.org/atlassian/json-schema-diff-validator"

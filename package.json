@@ -9,6 +9,10 @@
     {
       "name": "Dmitrii Sorin",
       "email": "dsorin@atlassian.com"
+    },
+    {
+      "name": "Tong Li",
+      "email": "tli@atlassian.com"
     }
   ],
   "main": "./dist/src/validator.js",

@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { deepClone } from 'fast-json-patch';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
@@ -28,11 +29,7 @@ describe('API', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
-    const newSchema = {
-      ...originalSchema,
-      definitions: { ...originalSchema.definitions },
-      required: [ ...originalSchema.required ],
-    };
+    const newSchema = deepClone(originalSchema);
 
     newSchema.definitions.field = { type: 'number' };
     newSchema.required.push('field');
@@ -44,13 +41,9 @@ describe('API', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
-    const newSchema = {
-      ...originalSchema,
-      definitions: { ...originalSchema.definitions },
-      required: [ ...originalSchema.required ],
-    };
+    const newSchema = deepClone(originalSchema);
 
-    newSchema.definitions.field = { type: 'number' };
+    newSchema.definitions.mntent.properties.field = { type: 'number' };
     assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
   });
 
@@ -58,24 +51,18 @@ describe('API', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
-    originalSchema.required = ['/'];
+    const newSchema = deepClone(originalSchema);
+    newSchema.required = ['/'];
 
-    const newSchema = {
-      ...originalSchema,
-      required: ['/', 'swap'],
-    };
-
-    assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
+    assert.throws(() => validateSchemaCompatibility(newSchema, originalSchema));
   });
 
   it('should return none if field becomes optional', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
-    const newSchema = {
-      ...originalSchema,
-      required: ['/'],
-    };
+    const newSchema = deepClone(originalSchema);
+    newSchema.required = ['/'];
 
     assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
   });
@@ -84,29 +71,22 @@ describe('API', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
-    const newSchema = {
-      ...originalSchema,
-      definitions: { ...originalSchema.definitions },
-    };
+    const newSchema = deepClone(originalSchema);
 
     newSchema.definitions.mntent = { type: 'number' };
     assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
   });
 
-  it('should not throw if node is added and it\'s required under subnodes', () => {
+  it('should throw even if node is added and it\'s required under subnodes', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
-    const newSchema = {
-      ...originalSchema,
-      definitions: { ...originalSchema.definitions },
-      required: [ ...originalSchema.required ],
-    };
+    const newSchema = deepClone(originalSchema);
 
-    newSchema.definitions.mntent.field = { type: 'number' };
+    newSchema.definitions.mntent.properties.field = { type: 'number' };
     newSchema.definitions.mntent.required.push('field');
 
-    assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
+    assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
   });
 
 });

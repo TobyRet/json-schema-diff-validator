@@ -10,15 +10,8 @@ function getData(fileName: string) {
 }
 
 function getSecondLastSubPath(path: string): string {
-  const index1 = path.lastIndexOf('/');
-  const index2 = path.substr(0, index1).lastIndexOf('/');
-  return path.substr(index2 + 1, index1 - 1);
-}
-
-function getLastSubPath(path: string): string {
-  const index1 = path.lastIndexOf('/');
-  const index2 = path.length;
-  return path.substr(index1 + 1 , index2);
+  const arr = path.split('/');
+  return arr[arr.length - 2];
 }
 
 export interface ValidatorOptions {
@@ -69,7 +62,7 @@ export function validateSchemaCompatibility(
           }
         }
 
-        if (pathTwoLastLevels === defn && getLastSubPath(path) === required ) {
+        if (pathTwoLastLevels === required) {
           diff.push(node);
         }
 

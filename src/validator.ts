@@ -16,6 +16,7 @@ function getSecondLastSubPath(path: string): string {
 
 export interface ValidatorOptions {
   allowNewOneOf?: boolean;
+  allowNewEnumValue?: boolean;
 }
 
 export function validateSchemaCompatibility(
@@ -52,10 +53,14 @@ export function validateSchemaCompatibility(
 
       case add:
         const isNewAnyOfItem = /items\/anyOf\/[\d]+$/.test(path);
+        const isNewEnumValue = /type\/enum\/[\d]+$/.test(path);
         const pathTwoLastLevels = getSecondLastSubPath(path);
 
         if (pathTwoLastLevels !== props && pathTwoLastLevels !== defn) {
-          if (isNewAnyOfItem && opts.allowNewOneOf) {
+          if (
+            (isNewAnyOfItem && opts.allowNewOneOf) ||
+            (isNewEnumValue && opts.allowNewEnumValue)
+          ) {
             // skip this
           } else {
             diff.push(node);

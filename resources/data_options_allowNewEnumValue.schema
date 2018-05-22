@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Sample schema for allowNewEnumValue option",
+  "$ref": "#/definitions/root",
+  "definitions": {
+    "root": {
+      "title": "string",
+      "properties": {
+        "fruit": {
+          "type": {
+            "enum": [
+             "apple"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

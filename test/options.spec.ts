@@ -37,4 +37,34 @@ describe('Options', () => {
       });
     });
   });
+
+  describe('allowNewEnumValue', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data_options_allowNewEnumValue.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+
+    const newSchema = deepClone(originalSchema);
+    newSchema.definitions.root.properties.fruit.type.enum.push('banana');
+
+    context('allowNewEnumValue is not set', () => {
+      it('should throw if there are new enum values', () => {
+        assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
+      });
+    });
+
+    context('allowNewEnumValue = True', () => {
+      it('should not throw if there are new enum values', () => {
+        assert.doesNotThrow(() => {
+          validateSchemaCompatibility(originalSchema, newSchema, { allowNewEnumValue: true });
+        });
+      });
+    });
+
+    context('allowNewEnumValue = False', () => {
+      it('should throw if there are new enum values', () => {
+        assert.throws(() => {
+          validateSchemaCompatibility(originalSchema, newSchema, { allowNewEnumValue: false });
+        });
+      });
+    });
+  });
 });

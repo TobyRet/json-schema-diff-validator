@@ -13,6 +13,10 @@
     {
       "name": "Tong Li",
       "email": "tli@atlassian.com"
+    },
+    {
+      "name": "Oscar Wallhult",
+      "email": "owallhult@atlassian.com"
     }
   ],
   "main": "./dist/src/validator.js",

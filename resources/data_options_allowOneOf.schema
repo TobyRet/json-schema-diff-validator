@@ -13,6 +13,34 @@
           }
         ]
       }
+    },
+    "anotherItem": {
+      "type": "object",
+      "content": {
+        "type": "array",
+        "items": [
+          {
+            "anyOf": [
+              {
+                "fruit": "banana"
+              },
+              {
+                "fruit": "apple"
+              }
+            ]
+          },
+          {
+            "anyOf": [
+              {
+                "coffee": "espresso"
+              },
+              {
+                "coffee": "flat white"
+              }
+            ]
+          }
+        ]
+      }
     }
   }
 }

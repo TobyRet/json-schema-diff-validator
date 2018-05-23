@@ -52,8 +52,8 @@ export function validateSchemaCompatibility(
         break;
 
       case add:
-        const isNewAnyOfItem = /items\/anyOf\/[\d]+$/.test(path);
-        const isNewEnumValue = /type\/enum\/[\d]+$/.test(path);
+        const isNewAnyOfItem = /items\/([\d]+\/)?anyOf\/[\d]+$/.test(path);
+        const isNewEnumValue = /enum\/[\d]+$/.test(path);
         const pathTwoLastLevels = getSecondLastSubPath(path);
 
         if (pathTwoLastLevels !== props && pathTwoLastLevels !== defn) {

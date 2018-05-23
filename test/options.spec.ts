@@ -14,6 +14,7 @@ describe('Options', () => {
 
     const newSchema = deepClone(originalSchema);
     newSchema.definitions.root.items.anyOf.push({ type: 'number' });
+    newSchema.definitions.anotherItem.content.items[0].anyOf.push({ fruit: 'pear' });
 
     context('allowNewOneOf is not set', () => {
       it('should throw if there are new oneOf elements', () => {
@@ -44,6 +45,7 @@ describe('Options', () => {
 
     const newSchema = deepClone(originalSchema);
     newSchema.definitions.root.properties.fruit.type.enum.push('banana');
+    newSchema.definitions.anotherItem.properties.tshirt.size.enum.push('large');
 
     context('allowNewEnumValue is not set', () => {
       it('should throw if there are new enum values', () => {

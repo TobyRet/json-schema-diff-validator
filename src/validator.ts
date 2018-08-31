@@ -52,7 +52,7 @@ export function validateSchemaCompatibility(
         break;
 
       case add:
-        const isNewAnyOfItem = /items\/([\d]+\/)?anyOf\/[\d]+$/.test(path);
+        const isNewAnyOfItem = /anyOf\/[\d]+$/.test(path);
         const isNewEnumValue = /enum\/[\d]+$/.test(path);
         const pathTwoLastLevels = getSecondLastSubPath(path);
 

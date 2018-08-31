@@ -15,6 +15,7 @@ describe('Options', () => {
     const newSchema = deepClone(originalSchema);
     newSchema.definitions.root.items.anyOf.push({ type: 'number' });
     newSchema.definitions.anotherItem.content.items[0].anyOf.push({ fruit: 'pear' });
+    newSchema.definitions.inline_node.anyOf.push(`{ "$ref": "#/definitions/hardBreak_node" }`);
 
     context('allowNewOneOf is not set', () => {
       it('should throw if there are new oneOf elements', () => {

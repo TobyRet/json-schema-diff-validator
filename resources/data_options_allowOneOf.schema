@@ -41,6 +41,60 @@
           }
         ]
       }
+    },
+    "inline_node": {
+     "anyOf": [
+        {
+          "$ref": "#/definitions/text_node"
+        }
+      ]
+    },
+    "text_node": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "text"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "marks": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "hardBreak_node": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "hardBreak"
+          ]
+        },
+        "attrs": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "enum": [
+                "\n"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
     }
   }
 }

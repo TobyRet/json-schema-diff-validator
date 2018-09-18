@@ -31,9 +31,11 @@
     "json-schema-diff-validator": "./dist/bin/cli.js"
   },
   "dependencies": {
-    "fast-json-patch": "^2.0.5"
+    "fast-json-patch": "^2.0.5",
+    "json-pointer": "^0.6.0"
   },
   "devDependencies": {
+    "@types/json-pointer": "^1.0.30",
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.30",
     "mocha": "^3.5.2",

@@ -3,7 +3,9 @@ import {
   compare as jsonpatchCompare,
   Operation,
 } from 'fast-json-patch';
+import { ReplaceOperation } from 'fast-json-patch/lib/core';
 import { readFileSync } from 'fs';
+import * as jsonpointer from 'json-pointer';
 
 function getData(fileName: string) {
   return JSON.parse(readFileSync(fileName, { encoding: 'utf-8' }));
@@ -37,18 +39,29 @@ export function validateSchemaCompatibility(
     const required = 'required';
     const props = 'properties';
     const defn = 'definitions';
+    const isMinItems = /minItems$/.test(path);
 
     switch (operation) {
       case move:
       case remove:
-        if (getSecondLastSubPath(path) !== required) {
+        if (
+          getSecondLastSubPath(path) === required ||
+          isMinItems
+        ) {
+          /** skip */
+        } else {
           diff.push(node);
         }
 
         break;
 
       case replace:
-        diff.push(node);
+        const oldValue = jsonpointer.get(originalSchema, path);
+        if (isMinItems && oldValue > (node as ReplaceOperation<number>).value) {
+          /** skip */
+        } else {
+          diff.push(node);
+        }
         break;
 
       case add:

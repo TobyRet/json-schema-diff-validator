@@ -70,4 +70,34 @@ describe('Options', () => {
       });
     });
   });
+
+  describe('minItems', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data_minItems.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+    let newSchema: any;
+    beforeEach(() => {
+      newSchema = deepClone(originalSchema);
+    })
+
+    it('should not throw if minItems is removed', () => {
+      delete newSchema.definitions.doc.properties.content.minItems;
+      assert.doesNotThrow(() => {
+        validateSchemaCompatibility(originalSchema, newSchema);
+      });
+    })
+
+    it('should not throw if minItems is replaced with smaller value', () => {
+      newSchema.definitions.doc.properties.content.minItems = 0;
+      assert.doesNotThrow(() => {
+        validateSchemaCompatibility(originalSchema, newSchema);
+      });
+    })
+
+    it('should throw if minItems is replaced with greater value', () => {
+      newSchema.definitions.doc.properties.content.minItems = 10;
+      assert.throws(() => {
+        validateSchemaCompatibility(originalSchema, newSchema);
+      });
+    })
+  })
 });

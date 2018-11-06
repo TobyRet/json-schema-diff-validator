@@ -11,7 +11,7 @@ Usage
 -----
 
 ```
-npm install json-schem-diff-validator -g
+npm install json-schema-diff-validator -g
 json-schema-diff-validator oldschema.json newschema.json
 ```
 
@@ -37,4 +37,3 @@ Supported options:
 
  * allowNewOneOf - new oneOf items are considered a backwards compatible change (`false` by default)
  * allowNewEnumValues - new enum values are considered a backwards compatible change (`false` by default)
- 

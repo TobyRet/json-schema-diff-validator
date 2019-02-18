@@ -3,7 +3,7 @@ import {
   compare as jsonpatchCompare,
   Operation,
 } from 'fast-json-patch';
-import { ReplaceOperation } from 'fast-json-patch/lib/core';
+import { AddOperation, ReplaceOperation } from 'fast-json-patch/lib/core';
 import { readFileSync } from 'fs';
 import * as jsonpointer from 'json-pointer';
 
@@ -19,6 +19,7 @@ function getSecondLastSubPath(path: string): string {
 export interface ValidatorOptions {
   allowNewOneOf?: boolean;
   allowNewEnumValue?: boolean;
+  allowReorder?: boolean;
 }
 
 export function validateSchemaCompatibility(
@@ -30,8 +31,11 @@ export function validateSchemaCompatibility(
   const remove = 'remove';
   const replace = 'replace';
   const add = 'add';
-  const diff: Operation[] = [];
+  let diff: Operation[] = [];
   const patch = jsonpatchCompare(originalSchema, changedSchema);
+
+  const removed: Array<{ name: string, node: ReplaceOperation<any> }> = [];
+  const inserted: string[] = [];
 
   patch.forEach(node => {
     const operation = node.op;
@@ -60,7 +64,12 @@ export function validateSchemaCompatibility(
         if (isMinItems && oldValue > (node as ReplaceOperation<number>).value) {
           /** skip */
         } else {
-          diff.push(node);
+          if (!opts.allowReorder) {
+            diff.push(node);
+          } else {
+            removed.push({ name: oldValue, node: node as ReplaceOperation<any> });
+            inserted.push((node as ReplaceOperation<any>).value);
+          }
         }
         break;
 
@@ -70,7 +79,9 @@ export function validateSchemaCompatibility(
         const pathTwoLastLevels = getSecondLastSubPath(path);
 
         if (pathTwoLastLevels !== props && pathTwoLastLevels !== defn) {
-          if (
+          if (isNewAnyOfItem && opts.allowReorder) {
+            inserted.push((node as AddOperation<any>).value.$ref);
+          } else if (
             (isNewAnyOfItem && opts.allowNewOneOf) ||
             (isNewEnumValue && opts.allowNewEnumValue)
           ) {
@@ -89,6 +100,15 @@ export function validateSchemaCompatibility(
       default:
     }
   });
+
+  if (opts.allowReorder) {
+    // When reordering is allowed, we want to make sure that any item that
+    // was replaced is also inserted somewhere else.
+    diff = [
+      ...diff,
+      ...removed.filter(node => inserted.indexOf(node.name) === -1).map(node => node.node),
+    ];
+  }
 
   // tslint:disable-next-line:max-line-length
   assert.strictEqual(diff.length, 0, `The schema is not backward compatible. Difference include breaking change = ${JSON.stringify(diff)}`);

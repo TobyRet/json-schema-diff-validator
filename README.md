@@ -35,5 +35,7 @@ Error: The schema is not backward compatible. Difference include breaking change
 
 Supported options:
 
- * allowNewOneOf - new oneOf items are considered a backwards compatible change (`false` by default)
+ * allowNewOneOf - new oneOf/anyOf items are considered a backwards compatible change (`false` by default)
  * allowNewEnumValues - new enum values are considered a backwards compatible change (`false` by default)
+ * allowReorder - reordering of `anyOf` items are considered a backwards compatible change (`false` by default)
+ 

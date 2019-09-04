@@ -144,4 +144,21 @@ describe('Options', () => {
       });
     });
   });
+
+  describe('deprecatedItems', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data_options_deprecatedItems.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+    let newSchema: any;
+    beforeEach(() => {
+      newSchema = deepClone(originalSchema);
+    });
+
+    it('should not throw if removed item is suppose to be deprecated', () => {
+      delete newSchema.definitions.old_node;
+      delete newSchema.definitions.block_content.anyOf[0];
+      assert.doesNotThrow(() => {
+        validateSchemaCompatibility(originalSchema, newSchema, { deprecatedItems: ['old_node'] });
+      });
+    });
+  });
 });

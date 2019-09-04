@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Sample schema for minItems test",
+  "$ref": "#/definitions/root",
+  "definitions": {
+    "block_content": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/old_node"
+        },
+        {
+          "$ref": "#/definitions/node"
+        }
+      ]
+    },
+    "old_node": {
+      "type": "object"
+    },
+    "node": {
+      "type": "object"
+    }
+  }
+}

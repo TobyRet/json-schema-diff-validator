@@ -64,15 +64,15 @@ export function validateSchemaCompatibility(
         /**
          * Check if the removed node is deprecated
          */
-        const depreatedItems = opts.deprecatedItems || [];
+        const deprecatedItems = opts.deprecatedItems || [];
         const isAnyOfItem = /anyOf\/[\d]+$/.test(path);
         if (isAnyOfItem) {
           const value = jsonpointer.get(originalSchema, path);
-          if (value.$ref && depreatedItems.indexOf(getLastSubPath(value.$ref)) !== -1) {
+          if (value.$ref && deprecatedItems.indexOf(getLastSubPath(value.$ref)) !== -1) {
             break;
           }
         } else {
-          if (depreatedItems.indexOf(getLastSubPath(path)) !== -1) {
+          if (deprecatedItems.indexOf(getLastSubPath(path)) !== -1) {
             break;
           }
         }

@@ -16,10 +16,16 @@ function getSecondLastSubPath(path: string): string {
   return arr[arr.length - 2];
 }
 
+function getLastSubPath(path: string): string {
+  const arr = path.split('/');
+  return arr[arr.length - 1];
+}
+
 export interface ValidatorOptions {
   allowNewOneOf?: boolean;
   allowNewEnumValue?: boolean;
   allowReorder?: boolean;
+  deprecatedItems?: string[];
 }
 
 export function validateSchemaCompatibility(
@@ -52,10 +58,26 @@ export function validateSchemaCompatibility(
           getSecondLastSubPath(path) === required ||
           isMinItems
         ) {
-          /** skip */
-        } else {
-          diff.push(node);
+          break;
         }
+
+        /**
+         * Check if the removed node is deprecated
+         */
+        const deprecatedItems = opts.deprecatedItems || [];
+        const isAnyOfItem = /anyOf\/[\d]+$/.test(path);
+        if (isAnyOfItem) {
+          const value = jsonpointer.get(originalSchema, path);
+          if (value.$ref && deprecatedItems.indexOf(getLastSubPath(value.$ref)) !== -1) {
+            break;
+          }
+        } else {
+          if (deprecatedItems.indexOf(getLastSubPath(path)) !== -1) {
+            break;
+          }
+        }
+
+        diff.push(node);
 
         break;
 

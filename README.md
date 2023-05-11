@@ -1,6 +1,12 @@
 json-schema-diff-validator
 ==========================
 
+This repository is a fork of the original 'json-schema-diff-validator' library available at https://bitbucket.org/atlassian/json-schema-diff-validator. It has been forked to introduce additional features and improvements to the library.
+
+### Modifications
+TBA
+
+
 This package allows comparision of two versions of schema file and detect any breaking change. The new version is considered as non-backward compatible when
 
 * a new node with minimum requirement is added.

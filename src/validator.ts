@@ -49,6 +49,8 @@ export function validateSchemaCompatibility(
     const required = 'required';
     const props = 'properties';
     const defn = 'definitions';
+    const description = 'description';
+    const examples = 'examples';
     const isMinItems = /minItems$/.test(path);
 
     switch (operation) {
@@ -82,6 +84,12 @@ export function validateSchemaCompatibility(
         break;
 
       case replace:
+        if (
+          getSecondLastSubPath(path) === examples || getLastSubPath(path) === description
+        ) {
+          break;
+        }
+
         const oldValue = jsonpointer.get(originalSchema, path);
         if (isMinItems && oldValue > (node as ReplaceOperation<number>).value) {
           /** skip */
@@ -96,6 +104,12 @@ export function validateSchemaCompatibility(
         break;
 
       case add:
+        if (
+          getLastSubPath(path) === examples || getLastSubPath(path) === description
+        ) {
+          break;
+        }
+
         const isNewAnyOfItem = /anyOf\/[\d]+$/.test(path);
         const isNewEnumValue = /enum\/[\d]+$/.test(path);
         const pathTwoLastLevels = getSecondLastSubPath(path);

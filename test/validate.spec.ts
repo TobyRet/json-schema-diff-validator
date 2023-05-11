@@ -57,7 +57,7 @@ describe('API', () => {
     assert.throws(() => validateSchemaCompatibility(newSchema, originalSchema));
   });
 
-  it('should return none if field becomes optional', () => {
+  it('should return if field becomes optional', () => {
     const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
     const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
 
@@ -89,4 +89,43 @@ describe('API', () => {
     assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
   });
 
+  it('should not throw if an example field is added', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+
+    const newSchema = deepClone(originalSchema);
+
+    newSchema.properties.swap.examples = ['CREATE', 'UPDATE'];
+    assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
+  })
+
+  it('should not throw if a description field is added', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+
+    const newSchema = deepClone(originalSchema);
+
+    newSchema.properties.swap.description = 'Oh lovely';
+    assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
+  })
+
+  it('it should not throw if examples are updated', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+
+    const newSchema = deepClone(originalSchema);
+
+    newSchema.properties.action.examples = ['CREATE'];
+    assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
+  })
+
+  it('it should not throw if descriptions are updated', () => {
+    const schemaPath = path.resolve(`${__dirname}/../resources/data.schema`);
+    const originalSchema = JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf-8' }));
+
+    const newSchema = deepClone(originalSchema);
+
+    newSchema.properties.action.description = 'An updated description';
+    assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema));
+  })
 });

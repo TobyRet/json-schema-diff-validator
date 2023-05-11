@@ -6,6 +6,11 @@
   "properties": {
     "swap": {
       "$ref": "#/definitions/mntent"
+    },
+    "action": {
+      "$ref": "#/definitions/mntent",
+      "example": ["UPDATE"],
+      "description": "Action to take on the filesystem"
     }
   },
   "patternProperties": {

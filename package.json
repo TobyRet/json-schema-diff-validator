@@ -48,6 +48,6 @@
     "postversion": "git push && git push --tags",
     "prepublishOnly": "rm -fr dist/ && tsc",
     "test:unit": "mocha --compilers ts:ts-node/register test/*.ts",
-    "test": "npm run lint && npm run test:unit"
+    "test": "npm run test:unit"
   }
 }

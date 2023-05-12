@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import {
   compare as jsonpatchCompare,
   Operation,
@@ -28,11 +27,16 @@ export interface ValidatorOptions {
   deprecatedItems?: string[];
 }
 
+export interface ValidationResponse {
+  valid: boolean;
+  errors?: string[];
+}
+
 export function validateSchemaCompatibility(
   originalSchema: any,
   changedSchema: any,
   opts: ValidatorOptions = {},
-): void {
+): ValidationResponse {
   const move = 'move';
   const remove = 'remove';
   const replace = 'replace';
@@ -49,6 +53,8 @@ export function validateSchemaCompatibility(
     const required = 'required';
     const props = 'properties';
     const defn = 'definitions';
+    const description = 'description';
+    const examples = 'examples';
     const isMinItems = /minItems$/.test(path);
 
     switch (operation) {
@@ -82,6 +88,12 @@ export function validateSchemaCompatibility(
         break;
 
       case replace:
+        if (
+          getSecondLastSubPath(path) === examples || getLastSubPath(path) === description
+        ) {
+          break;
+        }
+
         const oldValue = jsonpointer.get(originalSchema, path);
         if (isMinItems && oldValue > (node as ReplaceOperation<number>).value) {
           /** skip */
@@ -96,11 +108,17 @@ export function validateSchemaCompatibility(
         break;
 
       case add:
+        if (
+          getLastSubPath(path) === examples || getSecondLastSubPath(path) === examples || getLastSubPath(path) === description
+        ) {
+          break;
+        }
+
         const isNewAnyOfItem = /anyOf\/[\d]+$/.test(path);
         const isNewEnumValue = /enum\/[\d]+$/.test(path);
         const pathTwoLastLevels = getSecondLastSubPath(path);
 
-        if (pathTwoLastLevels !== props && pathTwoLastLevels !== defn) {
+        if (pathTwoLastLevels !== props && pathTwoLastLevels !== defn && pathTwoLastLevels !== required) {
           if (isNewAnyOfItem && opts.allowReorder) {
             inserted.push((node as AddOperation<any>).value.$ref);
           } else if (
@@ -132,15 +150,33 @@ export function validateSchemaCompatibility(
     ];
   }
 
-  // tslint:disable-next-line:max-line-length
-  assert.strictEqual(diff.length, 0, `The schema is not backward compatible. Difference include breaking change = ${JSON.stringify(diff)}`);
+  const valid = diff.length === 0;
+  let errors: string[] = [];
+
+  if (!valid) {
+    const prettifyError = {
+      add: 'Detected an additional required property, or disallowed property or field',
+      move: 'Detected a property or field that has been moved',
+      remove: 'Detected a missing property or field',
+      replace: 'Detected a change to a field value',
+    } as any;
+
+    errors = diff.map((node) => {
+      return `${prettifyError[node.op]}. Path - "${node.path}"`;
+    });
+  }
+
+  return {
+    errors,
+    valid,
+  };
 }
 
 export function validateSchemaFiles(
   file1: string,
   file2: string,
   opts: ValidatorOptions = {},
-): void {
+): ValidationResponse {
   const original = getData(file1);
   const changed = getData(file2);
 

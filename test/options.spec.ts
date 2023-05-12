@@ -4,8 +4,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {
   validateSchemaCompatibility,
-  validateSchemaFiles,
 } from '../src/validator';
+
+const successfulValidationObject = {
+  errors: [],
+  valid: true,
+};
 
 describe('Options', () => {
   describe('allowNewOneOf', () => {
@@ -19,23 +23,43 @@ describe('Options', () => {
 
     context('allowNewOneOf is not set', () => {
       it('should throw if there are new oneOf elements', () => {
-        assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
+        const results = validateSchemaCompatibility(originalSchema, newSchema);
+
+        const expectedErrorValidationObject = {
+          errors: [
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/inline_node/anyOf/1"',
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/anotherItem/content/items/0/anyOf/2"',
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/root/items/anyOf/1"',
+          ],
+          valid: false,
+        };
+
+        assert.deepStrictEqual(results, expectedErrorValidationObject);
       });
     });
 
     context('allowNewOneOf = True', () => {
       it('should not throw if there are new oneOf elements', () => {
-        assert.doesNotThrow(() => {
-          validateSchemaCompatibility(originalSchema, newSchema, { allowNewOneOf: true });
-        });
+        const results = validateSchemaCompatibility(originalSchema, newSchema, { allowNewOneOf: true });
+
+        assert.deepStrictEqual(results, successfulValidationObject);
       });
     });
 
     context('allowNewOneOf = False', () => {
       it('should throw if there are new oneOf elements', () => {
-        assert.throws(() => {
-          validateSchemaCompatibility(originalSchema, newSchema, { allowNewOneOf: false });
-        });
+        const results = validateSchemaCompatibility(originalSchema, newSchema, { allowNewOneOf: false });
+
+        const expectedErrorValidationObject = {
+          errors: [
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/inline_node/anyOf/1"',
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/anotherItem/content/items/0/anyOf/2"',
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/root/items/anyOf/1"',
+          ],
+          valid: false,
+        };
+
+        assert.deepStrictEqual(results, expectedErrorValidationObject);
       });
     });
   });
@@ -50,23 +74,41 @@ describe('Options', () => {
 
     context('allowNewEnumValue is not set', () => {
       it('should throw if there are new enum values', () => {
-        assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
+        const results = validateSchemaCompatibility(originalSchema, newSchema);
+
+        const expectedErrorValidationObject = {
+          errors: [
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/anotherItem/properties/tshirt/size/enum/2"',
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/root/properties/fruit/type/enum/1"',
+          ],
+          valid: false,
+        };
+
+        assert.deepStrictEqual(results, expectedErrorValidationObject);
       });
     });
 
     context('allowNewEnumValue = True', () => {
       it('should not throw if there are new enum values', () => {
-        assert.doesNotThrow(() => {
-          validateSchemaCompatibility(originalSchema, newSchema, { allowNewEnumValue: true });
-        });
+        const results = validateSchemaCompatibility(originalSchema, newSchema, { allowNewEnumValue: true });
+
+        assert.deepStrictEqual(results, successfulValidationObject);
       });
     });
 
     context('allowNewEnumValue = False', () => {
       it('should throw if there are new enum values', () => {
-        assert.throws(() => {
-          validateSchemaCompatibility(originalSchema, newSchema, { allowNewEnumValue: false });
-        });
+        const results = validateSchemaCompatibility(originalSchema, newSchema, { allowNewEnumValue: false });
+
+        const expectedErrorValidationObject = {
+          errors: [
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/anotherItem/properties/tshirt/size/enum/2"',
+            'Detected an additional required property, or disallowed property or field. Path - "/definitions/root/properties/fruit/type/enum/1"',
+          ],
+          valid: false,
+        };
+
+        assert.deepStrictEqual(results, expectedErrorValidationObject);
       });
     });
   });
@@ -86,15 +128,30 @@ describe('Options', () => {
       ...others,
     ];
 
-    context('allowReorder is not', () => {
+    context('allowReorder is not set', () => {
       it('should throw if items are reordered', () => {
-        assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema));
+        const results = validateSchemaCompatibility(originalSchema, newSchema, { allowNewOneOf: true });
+
+        const expectedErrorValidationObject = {
+          errors: [
+            'Detected a change to a field value. Path - "/definitions/inline_node/anyOf/2/$ref"',
+            'Detected a change to a field value. Path - "/definitions/inline_node/anyOf/1/$ref"',
+          ],
+          valid: false,
+        };
+
+        assert.deepStrictEqual(results, expectedErrorValidationObject);
       });
     });
 
     context('allowReorder = True', () => {
       it('should not throw if items are reordered', () => {
-        assert.doesNotThrow(() => validateSchemaCompatibility(originalSchema, newSchema, { allowReorder: true }));
+        const result = validateSchemaCompatibility(originalSchema, newSchema, {
+          allowNewOneOf: true,
+          allowReorder: true,
+        });
+
+        assert.deepStrictEqual(result, successfulValidationObject);
       });
 
       it('should throw if items are removed as a result of reordering', () => {
@@ -103,13 +160,31 @@ describe('Options', () => {
           { $ref: '#/definitions/status_node' },
           ...others,
         ];
-        assert.throws(() => validateSchemaCompatibility(originalSchema, invalidSchema, { allowReorder: true }));
+
+        const results = validateSchemaCompatibility(originalSchema, invalidSchema, { allowNewOneOf: true, allowReorder: true });
+
+        const expectedErrorValidationObject = {
+          errors: ['Detected a change to a field value. Path - "/definitions/inline_node/anyOf/0/$ref"'],
+          valid: false,
+        };
+
+        assert.deepStrictEqual(results, expectedErrorValidationObject);
       });
     });
 
     context('allowReorder = False', () => {
       it('should throw if items are reordered', () => {
-        assert.throws(() => validateSchemaCompatibility(originalSchema, newSchema, { allowReorder: false }));
+        const results = validateSchemaCompatibility(originalSchema, newSchema, { allowNewOneOf: true, allowReorder: false });
+
+        const expectedErrorValidationObject = {
+          errors: [
+            'Detected a change to a field value. Path - "/definitions/inline_node/anyOf/2/$ref"',
+            'Detected a change to a field value. Path - "/definitions/inline_node/anyOf/1/$ref"',
+          ],
+          valid: false,
+        };
+
+        assert.deepStrictEqual(results, expectedErrorValidationObject);
       });
     });
 
@@ -125,23 +200,33 @@ describe('Options', () => {
 
     it('should not throw if minItems is removed', () => {
       delete newSchema.definitions.doc.properties.content.minItems;
-      assert.doesNotThrow(() => {
-        validateSchemaCompatibility(originalSchema, newSchema);
-      });
+
+      const results = validateSchemaCompatibility(originalSchema, newSchema);
+
+      assert.deepStrictEqual(results, successfulValidationObject);
     });
 
     it('should not throw if minItems is replaced with smaller value', () => {
       newSchema.definitions.doc.properties.content.minItems = 0;
-      assert.doesNotThrow(() => {
-        validateSchemaCompatibility(originalSchema, newSchema);
-      });
+
+      const results = validateSchemaCompatibility(originalSchema, newSchema);
+
+      assert.deepStrictEqual(results, successfulValidationObject);
     });
 
     it('should throw if minItems is replaced with greater value', () => {
       newSchema.definitions.doc.properties.content.minItems = 10;
-      assert.throws(() => {
-        validateSchemaCompatibility(originalSchema, newSchema);
-      });
+
+      const results = validateSchemaCompatibility(originalSchema, newSchema);
+
+      const expectedErrorValidationObject = {
+        errors: [
+          'Detected a change to a field value. Path - "/definitions/doc/properties/content/minItems"',
+        ],
+        valid: false,
+      };
+
+      assert.deepStrictEqual(results, expectedErrorValidationObject);
     });
   });
 
@@ -156,9 +241,10 @@ describe('Options', () => {
     it('should not throw if removed item is suppose to be deprecated', () => {
       delete newSchema.definitions.old_node;
       delete newSchema.definitions.block_content.anyOf[0];
-      assert.doesNotThrow(() => {
-        validateSchemaCompatibility(originalSchema, newSchema, { deprecatedItems: ['old_node'] });
-      });
+
+      const results = validateSchemaCompatibility(originalSchema, newSchema, { deprecatedItems: ['old_node'] });
+
+      assert.deepStrictEqual(results, successfulValidationObject);
     });
   });
 });

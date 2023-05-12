@@ -19,10 +19,6 @@
         "customerId": {
           "type": "string",
           "description": "The customer id"
-        },
-        "customerName": {
-          "type": "string",
-          "description": "The customer name"
         }
       }
     },
